@@ -19,8 +19,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
-api_key = genai.configure(api_key=GOOGLE_API_KEY)
+from dotenv import load_dotenv
+load_dotenv
+api_key = genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 gemini = ChatGoogleGenerativeAI(model='gemini-1.5-flash', temperature=0.5,api_key=api_key)
 base_dir = os.path.dirname(os.path.abspath(__file__))  # Gets the directory of the current script
 class ConversationMemoryTool(BaseTool):
