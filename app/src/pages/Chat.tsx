@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Textarea from '@/components/textarea/textarea';
-import { LucideMic, LucideMicOff, LucideSend, LucideLoader,LucideVolume, LucideVolumeX  } from 'lucide-react';
+import { LucideMic, LucideMicOff, LucideSend, LucideLoader,LucideVolume, LucideVolumeX,LucideArrowLeft  } from 'lucide-react';
 
 interface Message {
   text: string;
@@ -26,6 +26,18 @@ const Chat: React.FC = () => {
   const [_isThoughtTyping, setIsThoughtTyping] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
+  const handleResetChat = () => {
+    setMessages([
+      { text: "Hello! I'm your Crystal Ball Assistant. Ask me anything, or choose from the suggestions below to get started.", sender: 'assistant' }
+    ]);
+    setMessage("");
+    setIsFirstQuery(true);
+    setIsThinking(false);
+    setCurrentThought(null);
+    setCurrentThoughtTyped('');
+    setFinalAnswer(null);
+    setDisplayedText('');
+  };
   
   useEffect(() => {
     if (isFirstQuery && !isTypingComplete) {
@@ -47,7 +59,7 @@ const Chat: React.FC = () => {
   const recommendedPrompts = [
     "What should the investment thesis for Turbostart APAC and why?",
     "Who is the founder of Meolaa?",
-    "What regulatory changes could impact TapInvest and how should we mitigate against?",
+    "What regulatory changes could impact TapInvest?",
     "Who will be the right set of investors for Turbostart MEA fund II?"
   ];
 
@@ -216,10 +228,18 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-dvh w-full md:w-2/3 rounded-lg overflow-hidden item">
-      <div className="bg-black text-white text-center py-3 font-semibold">
-        <h2>Crystal Ball Assistant</h2>
-      </div>
+  <div className="flex flex-col h-dvh w-full md:w-2/3 rounded-lg overflow-hidden item">
+    <div className="bg-black text-white py-3 font-semibold">
+    <div className="flex justify-between items-center">
+      <button
+        onClick={handleResetChat}
+        className="mx-2 bg-black text-white rounded-full focus:outline-none"
+      >
+        <LucideArrowLeft size={20} />
+      </button>
+      <h1 className='mx-auto'>Crystal Ball Assistant</h1>
+    </div>
+    </div>
       <div className="flex-1 p-4 overflow-y-auto ">
         {messages.map((msg, index) => (
           <div
