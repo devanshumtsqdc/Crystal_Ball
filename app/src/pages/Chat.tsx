@@ -46,7 +46,7 @@ const Chat: React.FC = () => {
 
   const recommendedPrompts = [
     "What should the investment thesis for Turbostart APAC and why?",
-    "What is the right exit strategy for Optimile, and how to execute it?",
+    "Who is the founder of Meolaa?",
     "What regulatory changes could impact TapInvest and how should we mitigate against?",
     "Who will be the right set of investors for Turbostart MEA fund II?"
   ];
