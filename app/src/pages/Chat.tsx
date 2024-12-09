@@ -25,7 +25,6 @@ const Chat: React.FC = () => {
   const [currentThoughtTyped, setCurrentThoughtTyped] = useState('');
   const [_isThoughtTyping, setIsThoughtTyping] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const synth = window.speechSynthesis;
 
   const handleResetChat = () => {
     if (synth.speaking) synth.cancel();
@@ -65,8 +64,9 @@ const Chat: React.FC = () => {
     "What regulatory changes could impact TapInvest?",
     "Who will be the right set of investors for Turbostart MEA fund II?"
   ];
-
+  
   const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  const synth = window.speechSynthesis;
   const recognition = SpeechRecognition ? new SpeechRecognition() : null;
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -165,6 +165,7 @@ const Chat: React.FC = () => {
       // Speak only if not muted
       if (!isMuted && synth) {
         const utterance = new SpeechSynthesisUtterance(newMessage);
+        synth.cancel();
         synth.speak(utterance);
       }
     }
