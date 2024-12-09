@@ -25,8 +25,10 @@ const Chat: React.FC = () => {
   const [currentThoughtTyped, setCurrentThoughtTyped] = useState('');
   const [_isThoughtTyping, setIsThoughtTyping] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const synth = window.speechSynthesis;
 
   const handleResetChat = () => {
+    if (synth.speaking) synth.cancel();
     setMessages([
       { text: "Hello! I'm your Crystal Ball Assistant. Ask me anything, or choose from the suggestions below to get started.", sender: 'assistant' }
     ]);
@@ -38,6 +40,7 @@ const Chat: React.FC = () => {
     setFinalAnswer(null);
     setDisplayedText('');
   };
+
   
   useEffect(() => {
     if (isFirstQuery && !isTypingComplete) {
@@ -65,7 +68,6 @@ const Chat: React.FC = () => {
 
   const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
   const recognition = SpeechRecognition ? new SpeechRecognition() : null;
-  const synth = window.speechSynthesis;
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -80,14 +82,14 @@ const Chat: React.FC = () => {
     webSocket.onmessage = (event) => {
       const newMessage = event.data;
       if (newMessage.startsWith("audio:")) {
-        const base64Audio = newMessage.replace("audio:", "");
-        const audioBytes = Uint8Array.from(atob(base64Audio), (c) => c.charCodeAt(0));
-        const audioBlob = new Blob([audioBytes], { type: 'audio/wav' });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        if (!isMuted) {
-          audio.play();
-        }
+        // const base64Audio = newMessage.replace("audio:", "");
+        // const audioBytes = Uint8Array.from(atob(base64Audio), (c) => c.charCodeAt(0));
+        // const audioBlob = new Blob([audioBytes], { type: 'audio/wav' });
+        // const audioUrl = URL.createObjectURL(audioBlob);
+        // const audio = new Audio(audioUrl);
+        // // if (!isMuted && !synth.cancel) {
+        // //   audio.play();
+        // // }
       } else if (newMessage.startsWith("Thought:")) {
         const thought = newMessage.replace("Thought:", "");
         setIsThinking(true);
@@ -218,7 +220,7 @@ const Chat: React.FC = () => {
 
   const toggleVolume = () => {
     setIsMuted((prev) => !prev);
-    if (synth && synth.speaking) {
+    if (synth.speaking) {
       if (!isMuted) {
         synth.pause(); // Mute: Pause the ongoing speech
       } else {
@@ -294,7 +296,13 @@ const Chat: React.FC = () => {
         <div className="flex items-center w-full max-w-2xl justify-center space-x-1">
           <Textarea 
             value={message} 
-            onChange={handleChange} 
+            onChange={handleChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent default behavior of adding a new line
+                handleSend(message);
+              }
+            }}
             placeholder="Type a message..." 
             className={`transition-all duration-300 ${
               isFirstQuery ? 'justify-center w-full h-16 max-w-2xl rounded-full' : 'justify-center w-full h-16 rounded-full'
