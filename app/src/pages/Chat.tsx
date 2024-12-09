@@ -70,7 +70,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     const webSocketUrl = import.meta.env.VITE_NODE_ENV === 'production'
-    ? `ws://34.133.146.109:8001/llm/ws/${clientId}`
+    ? `wss://34.133.146.109:8001/llm/ws/${clientId}`
     : `ws://127.0.0.1:8000/llm/ws/${clientId}`;
     // : `wss://daily-easy-monster.ngrok-free.app/llm/ws/${clientId}`;
     // const webSocketUrl = `wss://4f56-106-51-72-55.ngrok-free.app/llm/ws/${clientId}`
