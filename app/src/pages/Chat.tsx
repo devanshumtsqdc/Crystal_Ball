@@ -73,7 +73,7 @@ const Chat: React.FC = () => {
   useEffect(() => {
     const webSocketUrl = import.meta.env.VITE_NODE_ENV === 'production'
     ? `wss://34.133.146.109/llm/ws/${clientId}`
-    : `ws://127.0.0.1:8000/llm/ws/${clientId}`;
+    : `ws://127.0.0.1:8001/llm/ws/${clientId}`;
     // : `wss://daily-easy-monster.ngrok-free.app/llm/ws/${clientId}`;
     // const webSocketUrl = `wss://4f56-106-51-72-55.ngrok-free.app/llm/ws/${clientId}`
     const webSocket = new WebSocket(webSocketUrl);
@@ -267,9 +267,9 @@ const Chat: React.FC = () => {
 
         {/* Single Thought display */}
         {isThinking && (
-          <div className="p-3 my-2 rounded-lg bg-gray-300 text-gray-800 self-start flex items-center blinking-background">
+          <div className="p-3 my-2 rounded-lg bg-gray-300 text-gray-600 self-start flex items-center blinking-background">
             <LucideLoader className="animate-spin mr-2" />
-            <span>{currentThoughtTyped || "Thinking..."}</span>
+            <em >{currentThoughtTyped || "Thinking..."}</em>
           </div>
         )}
         {finalAnswer && (
