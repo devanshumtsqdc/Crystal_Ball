@@ -80,7 +80,7 @@ const Chat: React.FC = () => {
 
     webSocket.onopen = () => console.log('WebSocket connected');
     webSocket.onmessage = (event) => {
-      const newMessage = event.data;
+      const newMessage = event.data.trim();
       if (newMessage.startsWith("audio:")) {
         // const base64Audio = newMessage.replace("audio:", "");
         // const audioBytes = Uint8Array.from(atob(base64Audio), (c) => c.charCodeAt(0));
@@ -191,8 +191,9 @@ const Chat: React.FC = () => {
 
   const handleSend = (text: string) => {
     if (text.trim() && socket) {
-      socket.send(text);
-      setMessages((prevMessages) => [...prevMessages, { text: text, sender: 'user' }]);
+      const sanitizedText = text.replace(/[^a-zA-Z0-9.,!?'" ]/g, ''); 
+      socket.send(sanitizedText);
+      setMessages((prevMessages) => [...prevMessages, { text: sanitizedText, sender: 'user' }]);
       setMessage("");
       setCurrentThoughtTyped('');
       setIsFirstQuery(false);
