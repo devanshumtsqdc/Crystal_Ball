@@ -73,7 +73,7 @@ const Chat: React.FC = () => {
   useEffect(() => {
     const webSocketUrl =
       import.meta.env.VITE_NODE_ENV === "production"
-        ? `wss://34.93.45.111/llm/ws/${clientId}`
+        ? `ws://34.93.45.111:8000/llm/ws/${clientId}`
         : `ws://127.0.0.1:8001/llm/ws/${clientId}`;
     const webSocket = new WebSocket(webSocketUrl);
   
@@ -83,7 +83,7 @@ const Chat: React.FC = () => {
       const newMessage = event.data.trim();
   
       // Helper function for typing effect
-      const handleTypingEffect = (message) => {
+      const handleTypingEffect = (message: string) => {
         setIsThinking(true);
         setCurrentThought(message);
         setCurrentThoughtTyped("");
