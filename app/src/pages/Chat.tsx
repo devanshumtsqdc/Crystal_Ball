@@ -71,105 +71,77 @@ const Chat: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const webSocketUrl = import.meta.env.VITE_NODE_ENV === 'production'
-    ? `wss://34.133.146.109/llm/ws/${clientId}`
-    : `ws://127.0.0.1:8001/llm/ws/${clientId}`;
-    // : `wss://daily-easy-monster.ngrok-free.app/llm/ws/${clientId}`;
-    // const webSocketUrl = `wss://4f56-106-51-72-55.ngrok-free.app/llm/ws/${clientId}`
+    const webSocketUrl =
+      import.meta.env.VITE_NODE_ENV === "production"
+        ? `wss://34.93.45.111/llm/ws/${clientId}`
+        : `ws://127.0.0.1:8001/llm/ws/${clientId}`;
     const webSocket = new WebSocket(webSocketUrl);
-
-    webSocket.onopen = () => console.log('WebSocket connected');
+  
+    webSocket.onopen = () => console.log("WebSocket connected");
+  
     webSocket.onmessage = (event) => {
       const newMessage = event.data.trim();
+  
+      // Helper function for typing effect
+      const handleTypingEffect = (message) => {
+        setIsThinking(true);
+        setCurrentThought(message);
+        setCurrentThoughtTyped("");
+        setIsThoughtTyping(true);
+  
+        let index = -1;
+        const interval = setInterval(() => {
+          setCurrentThoughtTyped((prev) => prev + message[index]);
+          index += 1;
+          if (index >= message.length - 8) {
+            clearInterval(interval);
+            setIsThoughtTyping(false);
+          }
+        }, 5);
+      };
+  
       if (newMessage.startsWith("audio:")) {
-        // const base64Audio = newMessage.replace("audio:", "");
-        // const audioBytes = Uint8Array.from(atob(base64Audio), (c) => c.charCodeAt(0));
-        // const audioBlob = new Blob([audioBytes], { type: 'audio/wav' });
-        // const audioUrl = URL.createObjectURL(audioBlob);
-        // const audio = new Audio(audioUrl);
-        // // if (!isMuted && !synth.cancel) {
-        // //   audio.play();
-        // // }
-      } else if (newMessage.startsWith("Thought:")) {
-        const thought = newMessage.replace("Thought:", "");
-        setIsThinking(true);
-        setCurrentThought(thought);
-        setCurrentThoughtTyped(''); // Clear previous thought typing effect
-        setIsThoughtTyping(true);
-        
-        let index = -1;
-        const interval = setInterval(() => {
-          setCurrentThoughtTyped((prev) => prev + thought[index]);
-          index += 1;
-          if (index >= thought.length - 1) {
-            clearInterval(interval);
-            setIsThoughtTyping(false);
-          }
-        }, 5); 
-      } else if (newMessage.startsWith("Question:")) {
-        const thought = newMessage.replace("Question:", "");
-        setIsThinking(true);
-        setCurrentThought(thought);
-        setCurrentThoughtTyped(''); // Clear previous thought typing effect
-        setIsThoughtTyping(true);
-        
-        let index = -1;
-        const interval = setInterval(() => {
-          setCurrentThoughtTyped((prev) => prev + thought[index]);
-          index += 1;
-          if (index >= thought.length - 1) {
-            clearInterval(interval);
-            setIsThoughtTyping(false);
-          }
-        }, 5); 
-      } else if (newMessage.startsWith("Observation:")) {
-        const thought = newMessage.replace("Observation:", "");
-        setIsThinking(true);
-        setCurrentThought(thought);
-        setCurrentThoughtTyped(''); // Clear previous thought typing effect
-        setIsThoughtTyping(true);
-        
-        let index = -1;
-        const interval = setInterval(() => {
-          setCurrentThoughtTyped((prev) => prev + thought[index]);
-          index += 1;
-          if (index >= thought.length - 1) {
-            clearInterval(interval);
-            setIsThoughtTyping(false);
-          }
-        }, 5); 
+        // Handle audio logic here if needed
+      } else if (
+        newMessage.startsWith("Thought:") ||
+        newMessage.startsWith("Question:") ||
+        newMessage.startsWith("Observation:")
+      ) {
+        const thought = newMessage.split(":")[1];
+        handleTypingEffect(thought);
       } else {
-        let newFinalAnswer = newMessage;
+        // Handle final answer logic
         let index = -1;
+        const finalAnswer = newMessage;
         setIsThinking(false);
         setCurrentThought(null);
-        setCurrentThoughtTyped('');
-        setFinalAnswer(""); // Reset final answer for typewriter effect
-    
+        setCurrentThoughtTyped("");
+        setFinalAnswer("");
+  
         const interval = setInterval(() => {
-          setFinalAnswer((prev) => prev + newFinalAnswer[index]);
-          index++;
-          if (index >= newFinalAnswer.length - 1) {
+          setFinalAnswer((prev) => prev + finalAnswer[index]);
+          index += 1;
+          if (index >= finalAnswer.length-1) {
             clearInterval(interval);
-            
+  
             // Add completed final answer to messages
             setMessages((prevMessages) => [
               ...prevMessages,
-              { text: newFinalAnswer, sender: 'assistant' },
+              { text: finalAnswer, sender: "assistant" },
             ]);
-    
-            setFinalAnswer(null); // Clear finalAnswer after it's added
+  
+            setFinalAnswer(null);
           }
         }, 5);
-    
-      // Speak only if not muted
-      if (!isMuted && synth) {
-        const utterance = new SpeechSynthesisUtterance(newMessage);
-        synth.cancel();
-        synth.speak(utterance);
+  
+        // Speak the message if not muted
+        if (!isMuted && synth) {
+          const utterance = new SpeechSynthesisUtterance(finalAnswer);
+          synth.cancel();
+          synth.speak(utterance);
+        }
       }
-    }
-  };
+    };
 
     webSocket.onclose = () => console.log('WebSocket disconnected');
     setSocket(webSocket);
